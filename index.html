@@ -38,6 +38,7 @@
   .nav-links{display:flex;gap:30px;align-items:center}
   .nav-links a.link{font-weight:600;color:var(--muted);font-size:15px}
   .nav-links a.link:hover{color:var(--teal)}
+  .nav-links a.phone-link{color:var(--teal);font-weight:700}
   .nav .btn{padding:11px 22px;font-size:15px}
   .menu-btn{display:none;background:none;border:none;font-size:26px;color:var(--navy);cursor:pointer}
 
@@ -156,6 +157,7 @@
       <a class="link" href="#who">Who It's For</a>
       <a class="link" href="#products">Products</a>
       <a class="link" href="#how">How It Works</a>
+      <a class="link phone-link" href="tel:+15162416738">📞 (516) 241-6738</a>
       <a class="btn" href="#contact">Get More Info</a>
     </nav>
     <button class="menu-btn" onclick="document.querySelector('.nav-links').style.display = (document.querySelector('.nav-links').style.display==='flex'?'none':'flex')">☰</button>
@@ -186,6 +188,10 @@
         <h3>Get More Information</h3>
         <p class="fc-sub">See how much new revenue your business could add. Tell us a bit about yourself and we'll reach out — or book a quick call.</p>
         <form id="leadForm" onsubmit="return handleSubmit(event)">
+          <input type="hidden" name="_subject" value="New Lead — Vertical Health Partners">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="text" name="_honey" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
           <div class="field">
             <label>Full Name *</label>
             <input type="text" name="name" required placeholder="Jane Smith">
@@ -220,6 +226,7 @@
           </div>
           <button type="submit" class="btn">Send My Request</button>
           <p class="form-note">🔒 Your information is kept private. No obligation.</p>
+          <p class="form-note" style="margin-top:8px;font-size:13px">Prefer to talk now? Call <a href="tel:+15162416738" style="color:var(--teal);font-weight:700">(516) 241-6738</a></p>
         </form>
       </div>
       <div class="form-success" id="formSuccess">
@@ -314,6 +321,7 @@
     <h2>Ready to Add a New Revenue Stream?</h2>
     <p>It costs nothing to learn more. Tell us about your business and we'll show you exactly how it could work for you.</p>
     <a href="#contact" class="btn">Get More Info Today</a>
+    <p style="margin-top:20px;color:#e2f6f2;font-size:17px">or call us directly at <a href="tel:+15162416738" style="color:#fff;font-weight:800;text-decoration:underline">(516) 241-6738</a></p>
   </div>
 </section>
 
@@ -327,7 +335,7 @@
       </div>
       <div class="foot-contact">
         <strong style="color:#fff;display:block;margin-bottom:12px">Get In Touch</strong>
-        <a href="tel:+10000000000">📞 (000) 000-0000</a>
+        <a href="tel:+15162416738">📞 (516) 241-6738</a>
         <a href="mailto:info@verticalhealthpartners.com">✉️ info@verticalhealthpartners.com</a>
         <a href="#contact">📝 Request Information</a>
       </div>
@@ -341,12 +349,26 @@
 </footer>
 
 <script>
-  function handleSubmit(e){
+  async function handleSubmit(e){
     e.preventDefault();
-    // NOTE: On the live site this submits to the client's chosen email/CRM endpoint.
-    // Demo behavior shows the success state.
-    document.getElementById('formInner').style.display='none';
-    document.getElementById('formSuccess').style.display='block';
+    var form = e.target;
+    var btn = form.querySelector('button[type=submit]');
+    var original = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Sending…';
+    try {
+      var res = await fetch('https://formsubmit.co/ajax/info@verticalhealthpartners.com', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: new FormData(form)
+      });
+      if (!res.ok) throw new Error('bad status');
+      document.getElementById('formInner').style.display = 'none';
+      document.getElementById('formSuccess').style.display = 'block';
+      window.scrollTo({ top: document.getElementById('contact').offsetTop - 90, behavior: 'smooth' });
+    } catch (err) {
+      btn.disabled = false; btn.textContent = original;
+      alert('Sorry, something went wrong sending your request. Please call us at (516) 241-6738 and we\'ll help you right away.');
+    }
     return false;
   }
 </script>
